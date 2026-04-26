@@ -1,0 +1,99 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-cormorant: 'Cormorant Garamond', Georgia, serif;
+  --font-inter: 'Inter', system-ui, sans-serif;
+}
+
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    font-family: var(--font-inter);
+    background-color: #EDE9F4;
+  }
+
+  body {
+    @apply text-feria-dark antialiased;
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+
+  /* Safe area for bottom nav on iOS */
+  .pb-safe {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+
+  .pb-nav {
+    padding-bottom: calc(5rem + env(safe-area-inset-bottom));
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-feria-cream rounded-2xl border border-feria-border shadow-sm;
+  }
+
+  .card-paper {
+    @apply bg-feria-cream rounded-2xl border border-feria-border shadow-sm relative overflow-hidden;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  }
+
+  .btn-primary {
+    @apply bg-feria-lavender text-white font-semibold rounded-xl px-5 py-3
+           active:scale-95 transition-transform duration-100
+           disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100
+           focus:outline-none focus-visible:ring-2 focus-visible:ring-feria-lavender focus-visible:ring-offset-2;
+  }
+
+  .btn-secondary {
+    @apply bg-feria-cream-dark text-feria-dark font-semibold rounded-xl px-5 py-3
+           border border-feria-border
+           active:scale-95 transition-transform duration-100
+           disabled:opacity-50 disabled:cursor-not-allowed
+           focus:outline-none focus-visible:ring-2 focus-visible:ring-feria-border focus-visible:ring-offset-2;
+  }
+
+  .input {
+    @apply w-full bg-feria-cream border border-feria-border rounded-xl px-4 py-3
+           text-feria-dark placeholder:text-feria-muted
+           focus:outline-none focus:ring-2 focus:ring-feria-lavender focus:border-transparent
+           transition-colors duration-150;
+  }
+
+  .label {
+    @apply text-sm font-medium text-feria-dark mb-1.5 block;
+  }
+
+  .page-header {
+    @apply font-display text-3xl font-bold text-feria-dark tracking-tight;
+  }
+}
+
+/* Scroll snap for mobile */
+@layer utilities {
+  .snap-x-mandatory {
+    scroll-snap-type: x mandatory;
+  }
+
+  .snap-start {
+    scroll-snap-align: start;
+  }
+}
+
+/* Custom scrollbar — minimal */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #C8C3E0;
+  border-radius: 2px;
+}
