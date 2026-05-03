@@ -2,7 +2,8 @@
 
 import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { Plus, Package } from 'lucide-react'
+import Link from 'next/link'
+import { Plus, Package, LogIn } from 'lucide-react'
 import { ProductCard } from '@/components/ProductCard'
 import { FilterBar, type FilterState } from '@/components/FilterBar'
 import { AddProductModal } from '@/components/AddProductModal'
@@ -15,13 +16,13 @@ import type { Product, UserProfile, UndoSaleData, PaymentMethod } from '@/lib/ty
 interface InventarioClientProps {
   initialProducts: Product[]
   owners: UserProfile[]
-  currentUser: UserProfile
+  currentUser: UserProfile | null
 }
 
 export function InventarioClient({ initialProducts, owners, currentUser }: InventarioClientProps) {
   const router = useRouter()
   const { toast } = useToast()
-  const isVendedor = currentUser.role === 'vendedor'
+  const isVendedor = currentUser?.role === 'vendedor'
 
   const [products, setProducts] = useState<Product[]>(initialProducts)
   const [filters, setFilters] = useState<FilterState>({
@@ -52,7 +53,6 @@ export function InventarioClient({ initialProducts, owners, currentUser }: Inven
     metodoPago: PaymentMethod
     notas: string
   }) {
-    // Optimistic update
     setProducts(prev => prev.map(p =>
       p.id === data.productId ? { ...p, estado: 'vendido' } : p
     ))
@@ -61,7 +61,6 @@ export function InventarioClient({ initialProducts, owners, currentUser }: Inven
     const result = await createSale(data)
 
     if (!result.success || !result.saleId) {
-      // Revert
       setProducts(prev => prev.map(p =>
         p.id === data.productId ? { ...p, estado: 'disponible' } : p
       ))
@@ -95,11 +94,22 @@ export function InventarioClient({ initialProducts, owners, currentUser }: Inven
   return (
     <div className="px-4 pt-5 pb-4 space-y-4">
       {/* Header */}
-      <div>
-        <h1 className="page-header">Inventario</h1>
-        <p className="text-feria-muted text-sm mt-0.5">
-          {filtered.length} de {products.length} productos
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="page-header">Inventario</h1>
+          <p className="text-feria-muted text-sm mt-0.5">
+            {filtered.length} de {products.length} productos
+          </p>
+        </div>
+        {!currentUser && (
+          <Link
+            href="/login"
+            className="flex items-center gap-1.5 bg-feria-lavender text-white text-sm font-semibold px-4 py-2 rounded-full shadow-sm"
+          >
+            <LogIn className="w-4 h-4" />
+            Ingresar
+          </Link>
+        )}
       </div>
 
       {/* Filters */}
@@ -141,12 +151,14 @@ export function InventarioClient({ initialProducts, owners, currentUser }: Inven
       )}
 
       {/* Modals */}
-      <AddProductModal
-        open={addOpen}
-        onClose={() => setAddOpen(false)}
-        onSuccess={() => router.refresh()}
-        userId={currentUser.id}
-      />
+      {currentUser && (
+        <AddProductModal
+          open={addOpen}
+          onClose={() => setAddOpen(false)}
+          onSuccess={() => router.refresh()}
+          userId={currentUser.id}
+        />
+      )}
 
       <SaleModal
         product={selectedProduct}
