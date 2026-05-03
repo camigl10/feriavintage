@@ -30,14 +30,14 @@ export function UserChip({ user, size = 'sm', className }: UserChipProps) {
 interface UserDotProps {
   color: string
   size?: 'sm' | 'md' | 'lg'
+  className?: string
 }
 
-export function UserDot({ color, size = 'md' }: UserDotProps) {
+export function UserDot({ color, size = 'md', className }: UserDotProps) {
   const sizes = { sm: 'w-3 h-3', md: 'w-4 h-4', lg: 'w-6 h-6' }
   return (
     <div
-      className={cn('rounded-full flex-shrink-0', sizes[size])}
-      style={{ backgroundColor: color }}
+      className={cn('rounded-full flex-shrink-0', sizes[size], className)}
     />
   )
 }
