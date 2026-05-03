@@ -8,12 +8,13 @@ export default async function InventarioPage() {
 
   const { data: { user } } = await supabase.auth.getUser()
 
+  const profilePromise = user
+    ? supabase.from('users').select('*').eq('id', user.id).single()
+    : Promise.resolve({ data: null })
+
   const [{ data: profile }, { data: products }, { data: owners }] = await Promise.all([
-    supabase.from('users').select('*').eq('id', user!.id).single(),
-    supabase
-      .from('products')
-      .select('*, owner:users(*)')
-      .order('created_at', { ascending: false }),
+    profilePromise,
+    supabase.from('products').select('*, owner:users(*)').order('created_at', { ascending: false }),
     supabase.from('users').select('*').order('nombre'),
   ])
 
@@ -21,7 +22,7 @@ export default async function InventarioPage() {
     <InventarioClient
       initialProducts={products ?? []}
       owners={owners ?? []}
-      currentUser={profile!}
+      currentUser={profile}
     />
   )
 }
