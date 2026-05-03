@@ -1,44 +1,27 @@
-import type { Metadata, Viewport } from 'next'
-import { Cormorant_Garamond, Inter } from 'next/font/google'
-import './globals.css'
+import { createClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
+import { BottomNav } from '@/components/BottomNav'
+import { ToastProvider } from '@/components/ToastProvider'
 
-const cormorant = Cormorant_Garamond({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  style: ['normal', 'italic'],
-  variable: '--font-cormorant',
-  display: 'swap',
-})
+export default async function AppLayout({ children }: { children: React.ReactNode }) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
 
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter',
-  display: 'swap',
-})
+  if (user) {
+    const { data: profile } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', user.id)
+      .single()
+    if (!profile) redirect('/onboarding')
+  }
 
-export const metadata: Metadata = {
-  title: 'Feria Americana',
-  description: 'Gestión de inventario y ventas para tu feria americana',
-  manifest: '/manifest.json',
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: 'default',
-    title: 'Feria',
-  },
-}
-
-export const viewport: Viewport = {
-  width: 'device-width',
-  initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
-  themeColor: '#9590C8',
-}
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className={`${cormorant.variable} ${inter.variable}`}>
-      <body className="font-body">{children}</body>
-    </html>
+    <ToastProvider>
+      <div className="min-h-dvh bg-[#EDE9F4]">
+        <main className="pb-nav">{children}</main>
+        <BottomNav isLoggedIn={!!user} />
+      </div>
+    </ToastProvider>
   )
 }
