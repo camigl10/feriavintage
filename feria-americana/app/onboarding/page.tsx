@@ -10,7 +10,7 @@ export default function OnboardingPage() {
   const supabase = createClient()
 
   const [nombre, setNombre] = useState('')
-  const [color, setColor] = useState(USER_COLORS[0].value)
+  const [color, setColor] = useState<string>(USER_COLORS[0].value)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
